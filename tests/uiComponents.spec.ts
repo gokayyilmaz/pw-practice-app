@@ -50,3 +50,27 @@ test.describe("Modal & overlays page", () => {
 
   })
 })
+
+test("lists and dropdowns", async ({ page }) => {
+  // Check drowDownMenu option list
+  const dropDownMenu = page.locator("ngx-header nb-select")
+  await dropDownMenu.click()
+  const optionList = page.getByRole("list").locator("nb-option")
+  await expect(optionList).toHaveText(["Light", "Dark", "Cosmic", "Corporate"])
+
+  // Select options and check theme is applied
+  await dropDownMenu.click()
+  const header = page.locator("nb-layout-header")
+  const colors = {
+    "Light": "rgb(255, 255, 255)",
+    "Dark": "rgb(34, 43, 69)",
+    "Cosmic": "rgb(50, 50, 89)",
+    "Corporate": "rgb(255, 255, 255)"
+  }
+  for (const color in colors) {
+    await dropDownMenu.click()
+    await optionList.filter({ hasText: color }).click()
+    await expect(header).toHaveCSS("background-color", colors[color])
+  }
+
+})

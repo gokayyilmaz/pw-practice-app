@@ -57,9 +57,9 @@ test("lists and dropdowns", async ({ page }) => {
   await dropDownMenu.click()
   const optionList = page.getByRole("list").locator("nb-option")
   await expect(optionList).toHaveText(["Light", "Dark", "Cosmic", "Corporate"])
+  await dropDownMenu.click()
 
   // Select options and check theme is applied
-  await dropDownMenu.click()
   const header = page.locator("nb-layout-header")
   const colors = {
     "Light": "rgb(255, 255, 255)",
@@ -67,10 +67,10 @@ test("lists and dropdowns", async ({ page }) => {
     "Cosmic": "rgb(50, 50, 89)",
     "Corporate": "rgb(255, 255, 255)"
   }
-  for (const color in colors) {
+  for (const [color, colorValue] of Object.entries(colors)) {
     await dropDownMenu.click()
-    await optionList.filter({ hasText: color }).click()
-    await expect(header).toHaveCSS("background-color", colors[color])
+    await optionList.filter({hasText: color}).click()
+    await expect(header).toHaveCSS("background-color", colorValue)
   }
 
 })

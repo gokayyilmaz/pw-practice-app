@@ -85,3 +85,17 @@ test("tooltips", async({page}) => {
   await expect(page.locator("nb-tooltip")).toHaveText("This is a tooltip")
 
 })
+
+test("dialog boxes", async({page}) => {
+  await page.getByText("Tables & Data").click()
+  await page.getByText("Smart Table").click()
+
+  page.on("dialog", dialog => {
+    expect(dialog.message()).toEqual("Are you sure you want to delete?")
+    dialog.accept()
+  })
+
+  const firstRow = page.locator("table tbody tr").first()
+  await firstRow.locator(".nb-trash").click()
+  await expect(firstRow).not.toHaveText("mdo@gmail.com")
+})

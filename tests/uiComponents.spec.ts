@@ -69,24 +69,24 @@ test("lists and dropdowns", async ({ page }) => {
   }
   for (const [color, colorValue] of Object.entries(colors)) {
     await dropDownMenu.click()
-    await optionList.filter({hasText: color}).click()
+    await optionList.filter({ hasText: color }).click()
     await expect(header).toHaveCSS("background-color", colorValue)
   }
 
 })
 
-test("tooltips", async({page}) => {
+test("tooltips", async ({ page }) => {
   await page.getByText("Modal & Overlays").click()
   await page.getByText("Tooltip").click()
 
-  const toolTipCard = page.locator("nb-card", {hasText: "Tooltip Placements"})
-  await toolTipCard.getByRole("button", {name: "Top"}).hover()
+  const toolTipCard = page.locator("nb-card", { hasText: "Tooltip Placements" })
+  await toolTipCard.getByRole("button", { name: "Top" }).hover()
 
   await expect(page.locator("nb-tooltip")).toHaveText("This is a tooltip")
 
 })
 
-test("dialog boxes", async({page}) => {
+test("dialog boxes", async ({ page }) => {
   await page.getByText("Tables & Data").click()
   await page.getByText("Smart Table").click()
 
@@ -98,4 +98,42 @@ test("dialog boxes", async({page}) => {
   const firstRow = page.locator("table tbody tr").first()
   await firstRow.locator(".nb-trash").click()
   await expect(firstRow).not.toHaveText("mdo@gmail.com")
+})
+
+test("tables", async ({ page }) => {
+  await page.getByText("Tables & Data").click()
+  await page.getByText("Smart Table").click()
+
+  // get the row by any unique text in this row
+  const targetRow = page.getByRole("row", { name: "twitter@outlook.com" })
+  await targetRow.locator(".nb-edit").click()
+  await page.locator("input-editor").getByPlaceholder("Age").fill("35")
+  await page.locator(".nb-checkmark").click()
+
+  // get the row based on the value in the specific column
+  await page.getByRole("link", { name: "2" }).click()
+  const targetRowById = page.getByRole("row", { name: "11" }).filter({ has: page.locator("td").nth(1).getByText("11") })
+  await targetRowById.locator(".nb-edit").click()
+  await page.locator("input-editor").getByPlaceholder("E-mail").fill("test@test.com")
+  await page.locator(".nb-checkmark").click()
+  await expect(targetRowById.locator("td").nth(5)).toHaveText("test@test.com")
+
+  // test filter of the table
+  const ages = ["20", "30", "40", "200"]
+
+  for (const age of ages) {
+    await page.locator("input-filter").getByPlaceholder("Age").fill(age)
+    await page.waitForTimeout(500)
+    const ageRows = page.locator("table tbody tr")
+
+    for (const ageRow of await ageRows.all()) {
+      const ageCell = ageRow.locator("td").last()
+      if (age == "200") {
+        await expect(page.locator("tbody tr td")).toHaveText("No data found")
+      } else {
+        await expect(ageCell).toHaveText(age)
+      }
+    }
+  }
+
 })

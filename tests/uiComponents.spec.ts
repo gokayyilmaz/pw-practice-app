@@ -138,7 +138,7 @@ test("tables", async ({ page }) => {
 
 })
 
-test("datepicker", async({page}) => {
+test("datepicker", async ({ page }) => {
   await page.getByText("Forms").click()
   await page.getByText("Datepicker").click()
 
@@ -148,19 +148,51 @@ test("datepicker", async({page}) => {
   let date = new Date()
   date.setDate(date.getDate() + 14)
   const expectedDate = date.getDate().toString()
-  const expectedMonthShort = date.toLocaleString("En-US", {month: "short"})
-  const expectedMonthLong = date.toLocaleString("En-US", {month: "long"})
+  const expectedMonthShort = date.toLocaleString("En-US", { month: "short" })
+  const expectedMonthLong = date.toLocaleString("En-US", { month: "long" })
   const expectedYear = date.getFullYear()
   const dateToAssert = `${expectedMonthShort} ${expectedDate}, ${expectedYear}`
 
   let calendarMonthAndYear = await page.locator("nb-calendar-view-mode").textContent()
   const expectedMonthAndYear = ` ${expectedMonthLong} ${expectedYear} `
 
-  while (!calendarMonthAndYear?.includes(expectedMonthAndYear)){
-    await(page.locator("nb-calendar-pageable-navigation [data-name='chevron-right']")).click()
+  while (!calendarMonthAndYear?.includes(expectedMonthAndYear)) {
+    await (page.locator("nb-calendar-pageable-navigation [data-name='chevron-right']")).click()
     calendarMonthAndYear = await page.locator("nb-calendar-view-mode").textContent()
   }
 
-  await page.locator("[class='day-cell ng-star-inserted']").getByText(expectedDate, {exact: true}).click()
+  await page.locator("[class='day-cell ng-star-inserted']").getByText(expectedDate, { exact: true }).click()
   await expect(calendarInputField).toHaveValue(dateToAssert)
+})
+
+test("sliders", async ({ page }) => {
+
+  const tempBox = page.locator("nb-tab[tabtitle='Temperature'] ngx-temperature-dragger")
+
+  // update attribute
+  const tempGauge = page.locator("nb-tab[tabtitle='Temperature'] ngx-temperature-dragger circle")
+  await tempGauge.evaluate(node => {
+    node.setAttribute("cx", "229.528")
+    node.setAttribute("cy", "229.528")
+  })
+  await tempGauge.click()
+  await expect(tempBox).toContainText("30")
+
+  // mouse movement
+  await tempBox.scrollIntoViewIfNeeded()
+  const box = await tempBox.boundingBox()
+
+  if (!box) {
+    throw new Error("Temperature dragger bounding box could not be found")
+  }
+
+  const x = box.x + box?.width / 2
+  const y = box.y + box?.height / 2
+  await page.mouse.move(x, y)
+  await page.mouse.down()
+  await page.mouse.move(x + 100, y)
+  await page.mouse.move(x + 100, y + 100)
+  await page.mouse.up()
+  await expect(tempBox).toContainText("30")
+
 })

@@ -23,6 +23,11 @@ jobs:
       run: npx wait-on http://localhost:4200
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        URL_GLOBALSQA: https://www.globalsqa.com/demo-site/draganddrop/
+        URL_UITESTINGPLAYGROUND: http://uitestingplayground.com/ajax
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

@@ -1,7 +1,13 @@
 import { test, expect } from "@playwright/test"
 
 test("drag and drop with iframe", async ({ page }) => {
-  await page.goto("https://www.globalsqa.com/demo-site/draganddrop/")
+  const url = process.env.URL_GLOBALSQA
+
+  if(!url) {
+    throw new Error("URL_GLOBALSQA is not defined")
+  }
+
+  await page.goto(url)
   const frame = page.frameLocator("[rel-title='Photo Manager'] iframe")
 
   // with dragTo()

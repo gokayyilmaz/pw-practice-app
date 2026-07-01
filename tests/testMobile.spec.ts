@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 
-test("mobile test - input fields", async ({ page }, testInfo) => {
+test("input fields - compatible with mobile", async ({ page }, testInfo) => {
   await page.goto("/")
   if (testInfo.project.name == "mobile") {
     await page.locator(".sidebar-toggle").click()

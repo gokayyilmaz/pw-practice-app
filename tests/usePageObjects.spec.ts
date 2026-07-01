@@ -8,7 +8,9 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/")
 })
 
-test("navigate to form page", async ({ page }) => {
+test("navigate to form page", {
+  tag: "@smoke"
+}, async ({ page }) => {
   const navigationPage = new NavigationPage(page)
   await navigationPage.formLayoutsPage()
   await navigationPage.datepickerPage()
@@ -26,9 +28,9 @@ test("parameterized methods", async ({ page }) => {
 
   await navigationPage.formLayoutsPage()
   await formLayoutsPage.submitUsingTheGridFormWithCredentialsAndSelectOption(process.env.USERNAME, process.env.PASSWORD, "Option 2")
-  await page.screenshot({path: "screenshots/formsLayoursPage.png"})
+  await page.screenshot({ path: "screenshots/formsLayoursPage.png" })
   await formLayoutsPage.submitInlineFormWithNameEmailAndCheckbox(randomFullName, randomEmail, false)
-  await page.locator("nb-card", { hasText: "Inline form" }).screenshot({path: "screenshots/inlineForm.png"})
+  await page.locator("nb-card", { hasText: "Inline form" }).screenshot({ path: "screenshots/inlineForm.png" })
   await navigationPage.datepickerPage()
   await datePickerPage.selectCommonDatePickerDateFromToday(7)
   await datePickerPage.selectDatepickerWithRangeFromToday(7, 14)
